@@ -86,9 +86,9 @@ void Folder(DIR *dir,char *qq,char nndir[MAX_DIR_SIZE]){
             continue;
         }
         if(flag){break;}
-        strncpy(nnndir,nndir,MAX_SIZE);
-        strcat(nnndir,"\\\\");
-        strncat(nnndir,ptr->d_name,MAX_SIZE);
+        strncpy(nnndir,nndir,MAX_DIR_SIZE);
+        strcat(nnndir,"\\");
+        strncat(nnndir,ptr->d_name,MAX_DIR_SIZE);
         if((ndir=opendir(nnndir))!=NULL){
             Folder(ndir,qq,nnndir);
         }

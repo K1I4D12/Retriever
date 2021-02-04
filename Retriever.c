@@ -4,17 +4,18 @@
 #include<time.h>
 #include<windows.h>
 #include <pthread.h>
+#define MAX_DIR_SIZE 100
 #define MAX_SIZE 30
 #define NUM_THREADS 3
 void Folder(DIR *folder,char *qq,char nndir[]);
 void File(char *file,char*qq);
-void Find(void *args);
+void *Find(void *args);
 int flag=0;
 struct args {FILE *f1;char *qq;};
 int main(int argc,char *argv[]){
     clock_t start,finish;
     char qq[MAX_SIZE];
-    char nndir[100];
+    char nndir[MAX_DIR_SIZE];
     DIR *dir;
     if(argc<3){
         puts("You must input tow args.(./find.exe file line)");
@@ -22,7 +23,7 @@ int main(int argc,char *argv[]){
     }
     start = clock();
     puts("####################################START####################################");
-    strncpy(nndir,argv[1],MAX_SIZE);
+    strncpy(nndir,argv[1],MAX_DIR_SIZE);
     strncpy(qq,argv[2],MAX_SIZE);
     if((dir=opendir(nndir))==NULL){
         File(nndir,qq);
@@ -47,7 +48,7 @@ void File(char *file,char *qq){
     void *status;
     struct args arg={f1,qq};
     for(i=0;i<NUM_THREADS;i++){
-        int thread = pthread_create(&threads[i],NULL,Find,(void*)(void*)&arg);
+        int thread = pthread_create(&threads[i],NULL,Find,&arg);
         if(thread){
             puts("Thread start faild!");
             exit(0);
@@ -57,7 +58,7 @@ void File(char *file,char *qq){
         pthread_join(threads[i], &status);
     }
 }
-void Find(void *arg){
+void *Find(void *arg){
     struct args *narg = (struct args *)arg;
     FILE *f1=narg->f1;
     char *qq=narg->qq;
@@ -76,10 +77,10 @@ void Find(void *arg){
 }
 }
 
-void Folder(DIR *dir,char *qq,char nndir[100]){
+void Folder(DIR *dir,char *qq,char nndir[MAX_DIR_SIZE]){
     DIR *ndir;
     struct dirent *ptr;
-    char nnndir[100];
+    char nnndir[MAX_DIR_SIZE];
     while((ptr=readdir(dir))!=NULL){
         if(strcmp(ptr->d_name,".")==0||strcmp(ptr->d_name,"..")==0){
             continue;
